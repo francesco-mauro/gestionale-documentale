@@ -1,0 +1,10 @@
+{
+  // Compila solo src/ dentro dist/ per la produzione.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src"]
+}

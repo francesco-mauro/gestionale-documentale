@@ -1,0 +1,139 @@
+// Schema del database. Ogni "model" è una tabella SQLite.
+// Dopo ogni modifica: npm run db:migrate -- --name <descrizione> (crea la migrazione e rigenera il client).
+// Le liste (ruoli, tipi, stati) sono stringhe validate dal codice in src/lists.ts, non enum del database.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  runtime             = "nodejs"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// Utente del gestionale. role: ADMIN | OPERATOR | SELLER
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions           Session[]
+  auditLogs          AuditLog[]
+  createdClients     Client[]   @relation("ClientCreatedBy")
+  confirmedClients   Client[]   @relation("ClientConfirmedBy")
+  createdPractices   Practice[] @relation("PracticeCreatedBy")
+  confirmedPractices Practice[] @relation("PracticeConfirmedBy")
+  uploadedDocuments  Document[] @relation("DocumentUploadedBy")
+  confirmedDocuments Document[] @relation("DocumentConfirmedBy")
+  deletedDocuments   Document[] @relation("DocumentDeletedBy")
+}
+
+// Sessione di login: l'id è il token casuale salvato nel cookie.
+model Session {
+  id        String   @id
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Cliente: persona o azienda. confirmedAt = null significa "da confermare" (creato da un venditore).
+model Client {
+  id          Int       @id @default(autoincrement())
+  name        String
+  phone       String    @default("")
+  email       String    @default("")
+  address     String    @default("")
+  notes       String    @default("")
+  createdById Int
+  confirmedAt DateTime?
+  confirmedById Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  createdBy   User      @relation("ClientCreatedBy", fields: [createdById], references: [id])
+  confirmedBy User?     @relation("ClientConfirmedBy", fields: [confirmedById], references: [id])
+  practices   Practice[]
+}
+
+// Pratica di un cliente. type e status vengono dalle liste in src/lists.ts.
+model Practice {
+  id            Int       @id @default(autoincrement())
+  clientId      Int
+  type          String
+  status        String
+  openedAt      DateTime
+  siteAddress   String    @default("")
+  notes         String    @default("")
+  createdById   Int
+  confirmedAt   DateTime?
+  confirmedById Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  client      Client     @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  createdBy   User       @relation("PracticeCreatedBy", fields: [createdById], references: [id])
+  confirmedBy User?      @relation("PracticeConfirmedBy", fields: [confirmedById], references: [id])
+  documents   Document[]
+
+  @@index([clientId])
+}
+
+// Documento di una pratica. Nel database stanno solo i metadati: il file è su disco
+// nella cartella uploads con il nome casuale storedName. deletedAt != null = nel cestino.
+model Document {
+  id            Int       @id @default(autoincrement())
+  practiceId    Int
+  type          String
+  originalName  String
+  storedName    String    @unique
+  mimeType      String
+  sizeBytes     Int
+  documentDate  DateTime
+  notes         String    @default("")
+  uploadedById  Int
+  confirmedAt   DateTime?
+  confirmedById Int?
+  deletedAt     DateTime?
+  deletedById   Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  practice    Practice @relation(fields: [practiceId], references: [id], onDelete: Restrict)
+  uploadedBy  User     @relation("DocumentUploadedBy", fields: [uploadedById], references: [id])
+  confirmedBy User?    @relation("DocumentConfirmedBy", fields: [confirmedById], references: [id])
+  deletedBy   User?    @relation("DocumentDeletedBy", fields: [deletedById], references: [id])
+
+  @@index([practiceId])
+  @@index([deletedAt])
+  @@index([documentDate])
+}
+
+// Registro attività: chi ha fatto cosa e quando. summary è una frase in italiano già pronta da mostrare.
+// action: CREATE | UPDATE | DELETE | RESTORE | CONFIRM | LOGIN | LOGOUT
+// entityType: CLIENT | PRACTICE | DOCUMENT | USER
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  action     String
+  entityType String
+  entityId   Int
+  summary    String
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+  @@index([entityType, entityId])
+}

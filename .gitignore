@@ -1,0 +1,28 @@
+# Dipendenze e file compilati
+node_modules/
+dist/
+*.log
+
+# Segreti e dati locali (mai su git)
+.env
+server/data/
+server/uploads/
+
+# Codice generato da Prisma (si rigenera con "npx prisma generate")
+server/src/generated/
+
+# Documenti riservati del progetto, non vanno su GitHub
+docs/BRIEF.md
+CLAUDE.md
+
+# Sistema operativo ed editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Screenshot e snapshot del browser di test (Playwright)
+.playwright-mcp/
+
+# Database e file temporanei dei test
+server/tests/.tmp/

@@ -1,0 +1,524 @@
+/*
+  Stile del gestionale. Nessuna libreria: poche regole, tutte qui.
+  Tavolozza: verde "persiana" per barra laterale e azioni principali, sfondo chiaro
+  come vetro satinato, testo blu inchiostro. Ambra per ciò che aspetta conferma,
+  rosso per le azioni distruttive.
+*/
+
+:root {
+  --green: #2e5e4e;
+  --green-dark: #22463a;
+  --green-soft: #e3efe9;
+  --ink: #1d2a33;
+  --ink-soft: #5b6b76;
+  --paper: #f3f5f7;
+  --surface: #ffffff;
+  --line: #d5dbe0;
+  --amber: #c77d1a;
+  --amber-soft: #fbf1e0;
+  --red: #b3261e;
+  --red-soft: #fbe7e5;
+  --focus: #7fb8a2;
+
+  --radius: 6px;
+  --control-height: 40px;
+  --sidebar-width: 232px;
+
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink);
+  background-color: var(--paper);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+h2 {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+a {
+  color: var(--green);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+/* ---------- Struttura: barra laterale + contenuto ---------- */
+
+.shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: var(--green);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 8px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.brand strong {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.brand span {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 0;
+  flex: 1;
+}
+
+.nav a {
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+
+.nav a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav a.active {
+  background: #fff;
+  color: var(--green-dark);
+}
+
+.sidebar-user {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 14px;
+}
+
+.sidebar-user span {
+  opacity: 0.8;
+}
+
+.sidebar-user .btn {
+  margin-top: 12px;
+  align-self: flex-start;
+}
+
+.content {
+  padding: 32px 40px;
+  max-width: 1100px;
+  width: 100%;
+  /* Senza questo, una tabella larga allargherebbe la colonna della griglia oltre la finestra. */
+  min-width: 0;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.page-intro {
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+.page-loading {
+  padding: 40px;
+  color: var(--ink-soft);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.card + .card {
+  margin-top: 24px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---------- Tabelle ---------- */
+
+/* Su schermi stretti la tabella scorre in orizzontale invece di rompere l'impaginazione. */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.table th {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink-soft);
+  background: #f8fafb;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.table .actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.table-empty {
+  padding: 32px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+/* ---------- Etichette di stato ---------- */
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.badge-ok {
+  background: var(--green-soft);
+  color: var(--green-dark);
+}
+
+.badge-off {
+  background: #e9edf0;
+  color: var(--ink-soft);
+}
+
+.badge-pending {
+  background: var(--amber-soft);
+  color: #8a5410;
+}
+
+/* ---------- Pulsanti ---------- */
+
+.btn {
+  font: inherit;
+  font-weight: 500;
+  height: var(--control-height);
+  padding: 0 16px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--green);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--green-dark);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--paper);
+}
+
+.btn-danger {
+  background: var(--surface);
+  color: var(--red);
+  border-color: #e4b3af;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--red-soft);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: inherit;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-small {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+/* ---------- Form ---------- */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.field-hint {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+input,
+select {
+  font: inherit;
+  color: inherit;
+  height: var(--control-height);
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  width: 100%;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--green);
+  outline: 3px solid var(--focus);
+  outline-offset: 0;
+}
+
+/* ---------- Messaggi ---------- */
+
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+}
+
+.alert-error {
+  background: var(--red-soft);
+  border-color: #e4b3af;
+  color: #7a1a14;
+}
+
+.alert-success {
+  background: var(--green-soft);
+  border-color: #b9d6c8;
+  color: var(--green-dark);
+}
+
+.alert-info {
+  background: #e8eef3;
+  border-color: #cbd6df;
+  color: var(--ink);
+}
+
+/* ---------- Finestre di dialogo ---------- */
+
+.modal {
+  border: 0;
+  border-radius: var(--radius);
+  padding: 0;
+  width: min(520px, calc(100vw - 32px));
+  box-shadow: 0 16px 48px rgba(29, 42, 51, 0.25);
+}
+
+.modal::backdrop {
+  background: rgba(29, 42, 51, 0.45);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+}
+
+.modal-close {
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--ink-soft);
+  padding: 4px 8px;
+  border-radius: var(--radius);
+}
+
+.modal-close:hover {
+  background: var(--paper);
+}
+
+.modal-body {
+  padding: 20px 24px 24px;
+}
+
+/* ---------- Pagina di accesso ---------- */
+
+.login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.login-box {
+  width: min(400px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 32px;
+  border-top: 6px solid var(--green);
+}
+
+.login-box .brand {
+  border: 0;
+  padding: 0 0 24px;
+  color: var(--ink);
+}
+
+.login-box .brand strong {
+  font-size: 24px;
+}
+
+.login-box .brand span {
+  color: var(--ink-soft);
+  opacity: 1;
+}
+
+/* ---------- Schermi stretti ---------- */
+
+@media (max-width: 800px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    padding: 16px;
+  }
+
+  .nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 12px 0;
+  }
+
+  .content {
+    padding: 20px 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .table th,
+  .table td {
+    padding: 10px 12px;
+  }
+}

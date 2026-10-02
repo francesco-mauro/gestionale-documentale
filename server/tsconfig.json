@@ -1,0 +1,16 @@
+{
+  // Configurazione per controllare i tipi di tutto il backend (codice, test, seed, script).
+  // Non produce file: la compilazione vera usa tsconfig.build.json.
+  "compilerOptions": {
+    "target": "ES2024",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src", "tests", "prisma", "*.ts"]
+}
